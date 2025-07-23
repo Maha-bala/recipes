@@ -1,14 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:widproject/Api/Weatherapp.dart';
-import 'package:widproject/Api/demo_ww.dart';
-import 'package:widproject/Api/incredientscls.dart';
-import 'package:widproject/Api/ipinfo.dart';
-import 'package:widproject/Api/product.dart';
-import 'package:widproject/Api/recipecls.dart';
 import 'package:widproject/ctrl/btn.dart';
-import 'package:widproject/fahrencelsius.dart';
-
-import 'List api/JsonApi.dart';
+import 'Api/post.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home:Products()
+      home:StudentRecord()
     );
   }
 }

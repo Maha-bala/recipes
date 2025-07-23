@@ -1,42 +1,16 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:widproject/Api/recipecls.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 
 class Ingredients extends StatefulWidget {
-  const Ingredients({super.key});
+  Map<String,dynamic>oneItem={};
+      Ingredients({super.key,required this.oneItem});
 
   @override
   State<Ingredients> createState() => _IngredientsState();
 }
 
 class _IngredientsState extends State<Ingredients> {
-
-  Map<String,dynamic>bodydata={};
-  List items=[];
-  Future<Recipecls>getdata()async
-  {
-    try
-        {
-          var apiResponse=await http.get(Uri.parse("https://dummyjson.com/recipes"));
-          bodydata=jsonDecode(apiResponse.body);
-          print(bodydata);
-          if(apiResponse.statusCode==200)
-            {
-              items=bodydata["recipes"];
-              return Recipecls.fromJson(bodydata);
-            }
-          else
-            {
-              throw Exception(apiResponse.body);
-            }
-        }
-        catch(e)
-    {
-      throw Exception(e);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +25,7 @@ class _IngredientsState extends State<Ingredients> {
           )
         ],
       ),
-      body: FutureBuilder(future: getdata(), builder: (context,snapshot)
+        /* body: FutureBuilder(future: getdata(), builder: (context,snapshot)
       {
         if(snapshot.connectionState==ConnectionState.waiting)
           {
@@ -83,11 +57,7 @@ class _IngredientsState extends State<Ingredients> {
                         RichText(text: TextSpan(text: "INGREDIENTS",style: TextStyle(decoration: TextDecoration.underline,color: Colors.pink,fontSize: 18)))
                       ],
                     ),
-                    Text(items[index]["ingredients"][0]),
-                    Text(items[index]["ingredients"][1]),
-                    Text(items[index]["ingredients"][2]),
-                    Text(items[index]["ingredients"][3]),
-                    Text(items[index]["ingredients"][4]),
+                    Text(items[index]["ingredients"].toString()),
 
                     Row(
                       children: [
@@ -119,7 +89,147 @@ class _IngredientsState extends State<Ingredients> {
             return Text("No data found");
           }
       }
-      ),
+      ),*/
+      body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children:[
+              Row(
+                children: [
+                  Text("${widget.oneItem["id"].toString()}.",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
+                  Text(widget.oneItem["name"],style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 300,
+                  width: 400,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(35),
+                      image: DecorationImage(image: NetworkImage(widget.oneItem["image"]),fit: BoxFit.fill),
+                      shape: BoxShape.rectangle
+                  ),
+                  child: Column(
+                    children: [
+                      Spacer(),
+                      Row(
+                        children: [
+                          Spacer(),
+                          Text("Cuisine :",style: GoogleFonts.dancingScript(fontSize: 30,color: Colors.white,fontWeight: FontWeight.bold)),
+                          Text(widget.oneItem["cuisine"],style: GoogleFonts.dancingScript(fontSize: 30,color: Colors.white,fontWeight: FontWeight.bold))
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: RichText(text: TextSpan(text: "INGREDIENTS",style: TextStyle(decoration: TextDecoration.underline,color: Colors.purple,fontSize: 19))),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 100,
+                  width: 400,
+                  child: ListView.builder(
+                    itemCount: widget.oneItem["ingredients"].length,
+                      itemBuilder: (BuildContext,int index)
+                  {
+                    return Column(
+                      children: [
+                        SizedBox(width: 20,),
+                        Row(
+                          children: [
+                            Text("*${widget.oneItem["ingredients"][index]}",style: TextStyle(fontSize: 16),),
+                          ],
+                        ),
+                      ],
+                    );
+                  }),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: RichText(text: TextSpan(text: "Step by step process",style: TextStyle(decoration: TextDecoration.underline,color: Colors.red,fontSize: 19)),),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 200,
+                  width: 400,
+                  child: ListView.builder(
+                    itemCount: widget.oneItem["instructions"].length,
+                      itemBuilder: (BuildContext,int index)
+                  {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("*${widget.oneItem["instructions"][index]}",style: TextStyle(fontSize: 16),),
+                      ],
+                    );
+                  }),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+
+                    Container(
+                      height: 85,
+                      width: 95,
+                      decoration: BoxDecoration(
+                          color: Color(0xfff81f0c5),
+                          borderRadius: BorderRadius.circular(15)
+                      ),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 15,),
+                          Text("SERVINGS",style: TextStyle(fontSize: 18),),
+                          Text(widget.oneItem["servings"].toString(),style: TextStyle(fontSize: 18),),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      height: 85,
+                      width: 95,
+                      decoration: BoxDecoration(
+                          color: Color(0xffff0a1a1),
+                          borderRadius: BorderRadius.circular(15),shape: BoxShape.rectangle
+                      ),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 15,),
+                          Text("CALORIES",style: TextStyle(fontSize: 18),),
+                          Text(widget.oneItem["caloriesPerServing"].toString(),style: TextStyle(fontSize: 18),),
+                        ],
+                      ),
+                    ),
+
+                    Container(
+                      height: 85,
+                      width: 105,
+                      decoration: BoxDecoration(
+                          color: Color(0xfffab64ed),
+                          borderRadius: BorderRadius.circular(15),shape: BoxShape.rectangle
+                      ),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 15,),
+                          Text("DIFFICULTY",style: TextStyle(fontSize: 18),),
+                          Text(widget.oneItem["difficulty"],style: TextStyle(fontSize: 18),),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
     );
   }
 }
@@ -133,79 +243,3 @@ class _IngredientsState extends State<Ingredients> {
 
 
 
-class Recipes {
-  int? id;
-  String? name;
-  List<String>? ingredients;
-  List<String>? instructions;
-  int? prepTimeMinutes;
-  int? cookTimeMinutes;
-  int? servings;
-  String? difficulty;
-  String? cuisine;
-  int? caloriesPerServing;
-  List<String>? tags;
-  int? userId;
-  String? image;
-  double? rating;
-  int? reviewCount;
-  List<String>? mealType;
-
-  Recipes(
-      {this.id,
-        this.name,
-        this.ingredients,
-        this.instructions,
-        this.prepTimeMinutes,
-        this.cookTimeMinutes,
-        this.servings,
-        this.difficulty,
-        this.cuisine,
-        this.caloriesPerServing,
-        this.tags,
-        this.userId,
-        this.image,
-        this.rating,
-        this.reviewCount,
-        this.mealType});
-
-  Recipes.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    ingredients = json['ingredients'].cast<String>();
-    instructions = json['instructions'].cast<String>();
-    prepTimeMinutes = json['prepTimeMinutes'];
-    cookTimeMinutes = json['cookTimeMinutes'];
-    servings = json['servings'];
-    difficulty = json['difficulty'];
-    cuisine = json['cuisine'];
-    caloriesPerServing = json['caloriesPerServing'];
-    tags = json['tags'].cast<String>();
-    userId = json['userId'];
-    image = json['image'];
-    rating = json['rating'];
-    reviewCount = json['reviewCount'];
-    mealType = json['mealType'].cast<String>();
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['ingredients'] = this.ingredients;
-    data['instructions'] = this.instructions;
-    data['prepTimeMinutes'] = this.prepTimeMinutes;
-    data['cookTimeMinutes'] = this.cookTimeMinutes;
-    data['servings'] = this.servings;
-    data['difficulty'] = this.difficulty;
-    data['cuisine'] = this.cuisine;
-    data['caloriesPerServing'] = this.caloriesPerServing;
-    data['tags'] = this.tags;
-    data['userId'] = this.userId;
-    data['image'] = this.image;
-    data['rating'] = this.rating;
-    data['reviewCount'] = this.reviewCount;
-    data['mealType'] = this.mealType;
-    return data;
-  }
-}

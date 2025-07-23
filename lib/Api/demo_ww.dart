@@ -2,159 +2,129 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class WeatherScreen extends StatefulWidget {
-  const WeatherScreen({super.key});
+class Weather extends StatefulWidget {
+  const Weather({super.key});
 
   @override
-  State<WeatherScreen> createState() => _WeatherScreenState();
+  State<Weather> createState() => _WeatherState();
 }
 
-class _WeatherScreenState extends State<WeatherScreen> {
-  final TextEditingController _cityController = TextEditingController();
+class _WeatherState extends State<Weather> {
+  TextEditingController _city = TextEditingController();
+  Map<String, dynamic> bodyData = {};
+  String city = "";
 
-  Map<String,dynamic> weatherData={};
+  Future<void> getData() async {
+    try {
+      city = _city.text.trim().toLowerCase();
 
-  bool isLoading = false;
+      if (city.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please enter a city name")),
+        );
+        return;
+      }
 
-  Future<void> fetchWeather() async {
-    final city = _cityController.text.trim();
+      var res = await http.get(
+        Uri.parse(
+          "https://api.openweathermap.org/data/2.5/weather?q=$city&appid=5c84ee998e5c0b1e3ae4ff0d34ded67d",
+        ),
+      );
 
-    if (city.isEmpty) return;
+      print(res.statusCode);
+      print(res.body);
 
-    setState(() {
-      isLoading = true;
-    });
-
-    final url = Uri.parse("https://api.openweathermap.org/data/2.5/weather?q=$city&appid=94d0003c9da942cd5cb1d42ce5e075d3");
-
-    final response = await http.get(
-      url,
-      // headers: {
-      //   'X-RapidAPI-Key': '94d0003c9da942cd5cb1d42ce5e075d3',
-      //   'X-RapidAPI-Host': 'https://openweathermap.org/current',
-      // },
-    );
-
-    print("API Response: ${response.statusCode}");
-
-    if (response.statusCode == 200) {
-      setState(() {
-        weatherData = json.decode(response.body);
-        isLoading = false;
-      });
-    } else {
-      setState(() {
-        weatherData = {};
-        isLoading = false;
-      });
+      if (res.statusCode == 200) {
+        setState(() {
+          bodyData = jsonDecode(res.body);
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("City not found or API error")),
+        );
+      }
+    } catch (e) {
+      print(" Exception: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Something went wrong")),
+      );
     }
   }
 
-  String temp(){
-    try{
-      String tempinK=weatherData["main"]["temp"].toString();
-      print(tempinK);
-      double tempinC=double.parse(tempinK)-273.15;
-      return tempinC.toStringAsFixed(2);
-    }
-    catch(e){
+  String getLat() {
+    try {
+      return bodyData["coord"]["lat"].toString();
+    } catch (_) {
       return "null";
     }
   }
 
-  String humidity(){
-    try{
-      return weatherData["main"]["humidity"].toString();
-    }
-    catch(e){
+  String getLon() {
+    try {
+      return bodyData["coord"]["lon"].toString();
+    } catch (_) {
       return "null";
     }
   }
 
-  String pressure(){
-    try{
-      return weatherData["main"]["pressure"].toString();
-    }
-    catch(e){
+  String temp() {
+    try {
+      return "${bodyData["main"]["temp"]}°C";
+    } catch (_) {
       return "null";
+    }
+  }
+
+  String weatherDesc() {
+    try {
+      return bodyData["weather"][0]["description"];
+    } catch (_) {
+      return "";
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.indigo[100],
-      appBar: AppBar(
-        title: const Text("Weather App"),
-        backgroundColor: Colors.indigo,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextFormField(
-              controller: _cityController,
-              decoration: const InputDecoration(
-                hintText: "Enter city name",
-                border: OutlineInputBorder(),
-                filled: true,
-                fillColor: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: fetchWeather,
-              child: const Text("Get Weather"),
-            ),
-            const SizedBox(height: 20),
-            if (isLoading)
-              const Center(child: CircularProgressIndicator())
-            else if (weatherData != null)
-              Column(
-                children: [
-                  Text(
-                    "Temperature:${temp()}",
-                    style: const TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+        appBar: AppBar(title: const Text("Weather App")),
+        body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child:Column(
+              children: [
+                TextFormField(
+                  controller: _city,
+                  decoration: const InputDecoration(
+                    labelText: "Enter city name",
+                    border: OutlineInputBorder(),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    "Humidity:${humidity()}",
-                    style: const TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    "Pressure:${pressure()}",
-                    style: const TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  // Text(
-                  //   "${weatherData!['main']['temp']}°C",
-                  //   style: const TextStyle(fontSize: 50),
-                  // ),
-                  // const SizedBox(height: 10),
-                  // Text(
-                  //   "${weatherData!['weather'][0]['main']}",
-                  //   style: const TextStyle(fontSize: 24),
-                  // ),
-                ],
-              )
-            else
-              const Text("No data available"),
-          ],
-        ),
-      ),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: getData,
+                  child: const Text("Search"),
+                ),
+                const SizedBox(height: 20),
+
+
+                bodyData.isNotEmpty
+                    ? Column(
+// crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("City: ${city.toUpperCase()}",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
+                    Text("Temperature: ${temp()}"),
+                    Text("Latitude: ${getLat()}"),
+                    Text("Longitude: ${getLon()}"),
+                    Text("Weather: ${weatherDesc()}"),
+                  ],
+                )
+                    : Text("Please enter city name")
+
+                ,
+              ],
+            )
+        )
     );
   }
 }
