@@ -22,11 +22,11 @@ class _IndexState extends State<Index> {
   TextEditingController dept=TextEditingController();
   TextEditingController gender=TextEditingController();
 
-  Future<Map<String, dynamic>>Getbyid(idd) async
+  Future<Map<String, dynamic>>Getbyid() async
   {
     try
         {
-          var apiResponse=await http.get(Uri.parse("http://92.205.109.210:8051/api/getbyid/$idd"));
+          var apiResponse=await http.get(Uri.parse("http://92.205.109.210:8051/api/getbyid/1"));
           bodydata=jsonDecode(apiResponse.body);
           if(apiResponse.statusCode==200 || apiResponse.statusCode==201)
             {

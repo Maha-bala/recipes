@@ -38,6 +38,8 @@ class _RecipeState extends State<Recipe> {
   TextEditingController ctr=TextEditingController();
 
   List myCuisines=[];
+
+
   Future<Map> getdata() async{
     try{
       var apiResponse=await http.get(Uri.parse("https://dummyjson.com/recipes"));
@@ -140,85 +142,7 @@ class _RecipeState extends State<Recipe> {
                   );
                 }),
               ),
-              Container(
-                height: MediaQuery.of(context).size.height/1.6,
-                width: MediaQuery.of(context).size.width/1,
-                child: ListView.builder(
-                  itemCount: items.length,
-                    itemBuilder:(BuildContext,index)
-                {
-                  return Column(
-                    children: [
-                      Card(
-                        child: ListTile(
-                          title: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Text("${items[index]["id"].toString()}.",style: TextStyle(fontSize: 18),),
-                                  Text(items[index]["name"],style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
-                                ],
-                              ),
-                              Container(
-                                height: 200,
-                                width: 200,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(image: NetworkImage(items[index]["image"]),fit: BoxFit.fill),
-                                ),
-                              ),
-                            ],
-                          ),
-                          subtitle: Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
 
-                                  Column(
-                                    children: [
-                                      Icon(Icons.star,color: Colors.amberAccent,size: 35,),
-                                      Text(items[index]["rating"].toString())
-                                    ],
-                                  ),
-
-                                  Column(
-                                    children: [
-                                      Container(
-                                        height: 35,
-                                        width: 35,
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(image: AssetImage("prepp.png"),fit: BoxFit.fill)
-                                        ),
-                                      ),
-                                      Text("Prepare Time:${items[index]["prepTimeMinutes"]}mins")
-                                    ],
-                                  ),
-                                  Column(
-                                    children: [
-                                      Container(
-                                        height: 35,
-                                        width: 35,
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(image: AssetImage("cook.png"),fit: BoxFit.fill)
-                                        ),
-                                      ),
-                                      Text("Cook mins:${items[index]["cookTimeMinutes"].toString()}")
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                          onTap: ()
-                          {
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>Ingredients(oneItem:items[index],)));
-                          },
-                        ),
-                      ),
-                    ],
-                  );
-                }),
-              ),
             ],
           );
         }

@@ -22,12 +22,16 @@ class _WeatherApiState extends State<WeatherApi> {
 
   
   Map<String,dynamic>bodydata={};
-  Future<void>getdata()async
+  Future<void> getdata()async
   {
+
 
     try {
       final cityy = ctr.text;
-      if (cityy.isNotEmpty) {
+      if(cityy.isEmpty){
+        return;
+      }
+
         var apiResponse = await http.get(Uri.parse(
             "https://api.openweathermap.org/data/2.5/weather?q=$cityy&appid=f6ed274898d723e5d4a22c1261ecc027&units=metric"));
 
@@ -42,7 +46,7 @@ class _WeatherApiState extends State<WeatherApi> {
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Failed to fetch data")));
         }
-      }
+
     }catch(e){
       throw Exception(e);
     }
@@ -52,66 +56,73 @@ class _WeatherApiState extends State<WeatherApi> {
   dynamic cord()
   {
     try{
-      return bodydata["coord"]["lon"].toString();
+      var c="Longititude:${bodydata["coord"]["lon"].toString()}";
+      return c;
     }
-    catch(e){
-      return "null";
+    catch(_){
+      return "";
     }
   }
 
   dynamic hum()
   {
     try{
-      return bodydata["main"]["humidity"].toString();
+      var b="Humidity:${bodydata["main"]["humidity"].toString()}";
+      return b;
     }
-    catch(e){
-      return "null";
+    catch(_){
+      return "";
     }
   }
 
   dynamic weather()
   {
     try{
-      return bodydata["weather"]["description"].toString();
+      var x="Weather:${bodydata["weather"]["description"].toString()}";
+
+      return x;
     }
-    catch(e)
+    catch(_)
     {
-      return "null";
+      return "";
     }
   }
 
   dynamic pressure()
   {
     try{
-      return bodydata["main"]["pressure"].toString();
+      var y="Pressure:${bodydata["main"]["pressure"].toString()}";
+      return y;
     }
-    catch(e)
+    catch(_)
     {
-      return "null";
+      return "";
     }
   }
 
   dynamic sun()
   {
     try{
-      return bodydata["sys"]["sunrise"].toString();
+      var z="Sunrise:${bodydata["sys"]["sunrise"].toString()}";
+      return z;
     }
-    catch(e)
+    catch(_)
     {
-      return "null";
+      return "";
     }
   }
 
  dynamic temp()
  {
    try{
-     String k=bodydata["main"]["temp"].toString();
-     double c=double.parse(k)-273.15;
-     return c.toStringAsFixed(2);
+     var a="Temperature${bodydata["main"]["temp"].toString()}";
+     return a;
+
+
    }
-   catch(e)
+   catch(_)
    {
-     return 'null';
+     return '';
    }
  }
   
@@ -136,24 +147,72 @@ class _WeatherApiState extends State<WeatherApi> {
 
       body: Column(
         children: [
-          TextFormField(controller: ctr,),
-          ElevatedButton(onPressed: ()
+          FutureBuilder(future: getdata(), builder: (context,snapshot)
           {
-            getdata();
-          }, child: Text("Press")),
-          bodydata.isNotEmpty?
-          Column(
-            children: [
-              Text(temp()),
-              Text(pressure()),
-            ],
-          ):Text("Please enter city")
+            if(snapshot.connectionState==ConnectionState.waiting)
+            {
+              return CircularProgressIndicator();
+            }
+            else if(snapshot.hasError)
+            {
+              return Text("Error:${snapshot.error}");
+            }
+            else if(snapshot.hasData)
+            {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Data Fetched Successfully")));
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Data Fetched Successfully")));
+              //var mydata=snapshot.data!;
+              return Column(
+                children: [
+                  Text("Welcome")
+                ],
+              );
+            }
+            else
+            {
+              return Text("No data found");
+            }
+          }),
+          Container(
+            height: 400,
+            width: 400,
+            decoration: BoxDecoration(
+                image: DecorationImage(image: AssetImage("sunny.jpeg"),fit: BoxFit.fill)
+            ),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: ctr,
+                    decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.search),
+                        hintText: "City Name",
+                        fillColor: Colors.white,
+                        filled: true,
+                        border: OutlineInputBorder()
+                    ),
+                  ),
+                ),
+                ElevatedButton(onPressed: ()
+                {
+                  setState(() {
+                    getdata();
+                  });
+                }, child: Text("Get Weather")),
+
+                Text("${temp()}",style: TextStyle(fontSize: 45),),
+                Text("${cord()}"),
+                Text("${hum()}"),
+                Text("${pressure()}"),
+                Text("${sun()}"),
+              ],
+            ),
+          ),
         ],
       )
-
-
-
-
     );
   }
 }

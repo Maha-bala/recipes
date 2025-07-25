@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:widproject/ctrl/btn.dart';
-import 'Api/post.dart';
+import 'Api/recipecls.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home:StudentRecord()
+      home:Recipe()
     );
   }
 }

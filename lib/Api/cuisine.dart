@@ -21,7 +21,7 @@ class _CuisinesState extends State<Cuisines> {
     {
       var apiResponse=await http.get(Uri.parse("https://dummyjson.com/recipes/tag/${widget.twoitem}"));
       bodydata=jsonDecode(apiResponse.body);
-      cusitems=bodydata["recipes"];
+      cusitems=bodydata["cuisines"];
       print(bodydata);
       if(apiResponse.statusCode==200)
         {
